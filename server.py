@@ -3,10 +3,8 @@ import joblib
 import numpy as np
 import os
 
-# إنشاء Flask App
 app = Flask(__name__)
 
-# تحميل الموديل
 MODEL_PATH = os.path.join("model", "gas_model.pkl")
 
 try:
@@ -17,7 +15,6 @@ except Exception as e:
     model = None
 
 
-# Route تجريبية
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
@@ -26,7 +23,6 @@ def home():
     })
 
 
-# Route التنبؤ (ESP بيكلمها)
 @app.route("/predict", methods=["POST"])
 def predict():
     if model is None:
@@ -42,17 +38,12 @@ def predict():
         X = np.array([[mq2, temp, hum]])
         prediction = model.predict(X)[0]
 
-        return jsonify({
-            "danger": int(prediction)
-        })
+        return jsonify({"danger": int(prediction)})
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 400
+        return jsonify({"error": str(e)}), 400
 
 
-# تشغيل السيرفر (مهم جدًا لـ Railway)
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
